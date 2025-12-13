@@ -19,8 +19,7 @@ notes_blueprint = Blueprint("notes",__name__)
 
 @notes_blueprint.route("/", methods=["GET"])
 def get_notes():
-    notes = Notetable.query.all()   # fetch all rows from DB
-
+    notes = Notetable.query.all()  
     notes_data = []
     for note in notes:
         notes_data.append({
