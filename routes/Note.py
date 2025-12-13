@@ -1,5 +1,7 @@
 
 from flask import Blueprint,render_template,request,jsonify
+from database import db
+from models import Notetable
 
 home_blueprint = Blueprint("home", __name__)
 
@@ -10,14 +12,26 @@ def home():
 
 notes_blueprint = Blueprint("notes",__name__)
 
-note_list = []
-next_id = 1
+
+
 
 
 
 @notes_blueprint.route("/", methods=["GET"])
 def get_notes():
-    return jsonify(note_list), 200
+    notes = Notetable.query.all()   # fetch all rows from DB
+
+    notes_data = []
+    for note in notes:
+        notes_data.append({
+            "id": note.id,
+            "title": note.title,
+            "content": note.content,
+            "tags": note.tags,
+            "created_at": note.created_at,
+            "updated_at": note.updated_at
+        })
+    return jsonify(notes_data), 200
 
 @notes_blueprint.route("/", methods=["POST"])
 def notes():
@@ -28,16 +42,21 @@ def notes():
      if not data.get(field):    
       return jsonify({"error":f"Missing {field}"}),400
      
-    new_notes = {
-          "id": next_id,
-          "title": data['title'],
-          "content":data['content'],
-          "tags":data['tags']
-     }
+    new_notes = Notetable(
+          title= data['title'],
+          content=data['content'],
+          tags=data['tags']
+     )
     
-    note_list.append(new_notes)
-    next_id = next_id +1
+   
+    
+
+    db.session.add(new_notes)
+    db.session.commit()
+
+    
+    return jsonify(new_notes.to_dict()), 201
 
     
 
-    return jsonify(new_notes), 201
+    

@@ -1,16 +1,29 @@
 from flask import Flask
+from database import db
+from models import Notetable
 from routes.Note import home_blueprint,notes_blueprint
-
 
 app = Flask(__name__)
 
-@app.route("/ping")
+app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///notes.db'
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+ 
+db.init_app(app)
+
+
+@app.route("/")
 def ping():
     return {"message": "pong"}
+
+
+    
 
 app.register_blueprint(home_blueprint) 
 app.register_blueprint(notes_blueprint, url_prefix="/api/notes")
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+     with app.app_context():
+        db.create_all()
+        print("✅ tables created")
+     app.run(debug=True)
