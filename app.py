@@ -25,5 +25,5 @@ app.register_blueprint(notes_blueprint, url_prefix="/api/notes")
 if __name__ == "__main__":
      with app.app_context():
         db.create_all()
-        print("✅ tables created")
+        print("tables created")
      app.run(debug=True)
